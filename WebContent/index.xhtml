@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<h:head>
+		<title>COMPILADORES | TABELA SINTATICA</title>
+		<link href="resources/semantic/semantic.min.css" rel="stylesheet" type="text/css" />
+		<style>
+			input {
+				width: 100%;
+			}
+		</style>
+	</h:head>
+	<h:body>
+	
+	<h:form id="form" prependId="false">
+		<p:growl id="growl" life="9000" showDetail="true" />
+		<div class="ui container">
+			<h3>#{hello.message}</h3>
+			<hr />
+			<div class="ui two column grid">
+				<div class="column">
+					<p:inputText placeholder="Variáveis" value="#{tabelaSintatica.variavel}"/>
+				</div>
+				<div class="column">
+					<p:inputText placeholder="Simbolos de Entrada" value="#{tabelaSintatica.simbolo}"/>
+				</div>
+				<div class="row">
+					<div class="column">
+						<p:commandButton title="Estrutura Tabela" value="Estrutura Tabela" actionListener="#{tabelaSintatica.montaEstruturaTabela}"
+							update="tabelaSintatica"/>
+					</div>
+				</div>
+			</div>
+			<div class="ui one column grid">
+				<div class="row">
+					<div class="column">
+						<p:dataTable emptyMessage="Contrua a Estrutura da Tabela" value="#{tabelaSintatica.registros}"
+							editMode="cell" editable="true" var="registro" id="tabelaSintatica">
+
+							<f:facet name="header">
+			          		 :. TABELA SINTÁTICA .:
+			        		</f:facet>
+			        		
+			        		<p:ajax event="cellEdit" listener="#{tabelaSintatica.onCellEdit}" update=":growl :tabelaSintatica" />
+
+							<p:columnGroup type="header">
+								<p:row>
+									<p:column rowspan="2" headerText="Variáveis" />
+									<p:column colspan="#{tabelaSintatica.simbolosCount}" headerText="Símbolos de Entrada" />
+								</p:row>
+								<p:row>
+									<ui:repeat value="#{tabelaSintatica.simbolos}" var="simbolo" varStatus="loop">
+										<p:column headerText="#{simbolo}" id="col#{loop.index}" footerText="col#{loop.index}" />
+									</ui:repeat>
+								</p:row>
+							</p:columnGroup>
+
+							<p:column style="text-align:center;">
+								<h:outputText value="#{registro.variavel}" style="font-weight: bold;" />
+							</p:column>
+
+							<p:columns value="#{tabelaSintatica.simbolos}" headerText="#{letra}" var="letra" columnIndexVar="colIndexVar">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{registro.getProducao(letra)}" style="text-align:right;" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText id="modelInput" value="#{registro.producao}">
+											<p:ajax listener="#{tabelaSintatica.pegaColuna(letra)}" update=":growl"/>
+										</p:inputText>
+									</f:facet> 
+								</p:cellEditor>
+							</p:columns>
+
+							<f:facet name="footer">
+			         			  :. UNIVERSIDADE FEDERAL DO TOCANTINS .:
+			        		</f:facet>
+
+						</p:dataTable>
+					</div>
+				</div>
+			</div> 
+			<div class="ui three column grid">
+				<div class="eight wide column">
+					<p:inputText placeholder="Sentença" value="#{tabelaSintatica.sentenca}"/>
+				</div>
+				
+				<div class="two wide column">
+					<p:commandButton title="Analisar" value="Analisar" actionListener="#{tabelaSintatica.analisar}" update=":form :growl"/>
+				</div>
+				<div class="two wide column">
+					<p:commandButton title="Limpar" value="Limpar" actionListener="#{tabelaSintatica.limpar}" update=":form"/>
+				</div>
+			</div>
+		</div>
+	</h:form>
+</h:body>
+</html>
